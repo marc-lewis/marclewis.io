@@ -30,20 +30,66 @@
         }
 
         .info__linkedin {
+            border: 1px solid #333333;
+            border-bottom: 2px solid #333333;
+            border-radius: 5px;
             color: #333333;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 3vw;
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            position: relative;
+            text-decoration: none;
+            width: 50px;
         }
+
+        .info__linkedin:hover {
+            border-bottom: 1px solid #333333;
+            margin-bottom: 11px;
+            top: 1px;
+        }
+
+        .info__linkedin:active {
+            border-top: 2px solid #333333;
+            padding: 11px 20px 8px;
+        }
+
 
     </style>
 </head>
 <body>
-    <main>
-        <section class="info">
-            <!-- get outta here! -->
-            <h1 class="info__name">Marc Lewis</h1>
-            <h2 class="info__linkedin"><a href="https://www.linkedin.com/in/marc-lewis-58a2b37b/">linkedin</a></h3>
-        </section>
-    </main>
+<main>
+    <section class="info">
+        <!-- get outta here! -->
+        <h1 class="info__name">Marc Lewis</h1>
+        <a class="info__linkedin" href="https://www.linkedin.com/in/marc-lewis-58a2b37b/">linkedin</a>
+    </section>
+</main>
+<script>
+
+  function getAudio(source) {
+    return new Promise((resolve, reject) => {
+      const clip = new Audio(source);
+      clip.addEventListener('loadeddata', () => {
+        resolve(clip);
+      })
+    })
+  }
+
+  Promise.all([
+    getAudio('https://snd-effcts.s3-eu-west-1.amazonaws.com/zapsplat_multimedia_click_001_19367.mp3'),
+    getAudio('https://snd-effcts.s3-eu-west-1.amazonaws.com/zapsplat_multimedia_click_003_19369.mp3')
+  ])
+    .then(([click1, click2]) => {
+      document.querySelectorAll('a').forEach((button) => {
+        button.addEventListener('mouseover', () => {
+          click1.play();
+        });
+        button.addEventListener('click', () => {
+          click2.play();
+        })
+      });
+    });
+
+</script>
 </body>
 </html>
