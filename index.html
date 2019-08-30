@@ -83,10 +83,10 @@
     .then(([click1, click2]) => {
       document.querySelectorAll('a').forEach((button) => {
         button.addEventListener('mouseover', () => {
-          click1.play();
+          click1.play().catch((err) => console.log(err));
         });
         button.addEventListener('click', () => {
-          click2.play();
+          click2.play().catch((err) => console.log(err));
         })
       });
     });
