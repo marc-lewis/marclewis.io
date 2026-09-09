@@ -3,94 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="The personal homepage of Marc Lewis.">
     <title>Marc Lewis</title>
-    <style type="text/css">
-
-        html, body, main {
-            height: 100%;
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='4.5' width='12' height='7' rx='1.5' fill='none' stroke='%23333' stroke-width='1.5'/%3E%3C/svg%3E">
+    <style>
+        :root {
+            --ink: #333333;
+            --gap: 10px;
+            --pop-duration: 650ms;
+            --wipe-step: 45ms; /* per-column stagger; the sweep is capped at ~900ms in JS */
         }
 
-        main {
-            align-items: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        .info {
-            text-align: center;
-        }
-
-        .info__name {
-            color: #333333;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 8vw;
+        body {
             margin: 0;
-            text-align: center;
+            overflow: hidden;
         }
 
-        .info__linkedin {
-            border: 1px solid #333333;
-            border-bottom: 2px solid #333333;
+        /*
+         * The wall: a sheet of buttons, oversized (150%) and rotated -10deg,
+         * so its corners always sit past the edge of the viewport.
+         */
+
+        .field {
+            inset: 0;
+            overflow: hidden;
+            position: fixed;
+            user-select: none;
+        }
+
+        .field__sheet {
+            align-content: flex-start;
+            align-items: flex-start;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap);
+            height: 150vh;
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            width: 150vw;
+        }
+
+        /*
+         * The button fakes depth with its border: resting state has a 2px
+         * bottom edge, hover presses it flat, active pushes it in.
+         */
+
+        .btn {
+            animation: pop var(--pop-duration) backwards;
+            border: 1px solid var(--ink);
+            border-bottom: 2px solid var(--ink);
             border-radius: 5px;
-            color: #333333;
+            box-sizing: content-box;
+            color: var(--ink);
             display: block;
             font-family: Arial, Helvetica, sans-serif;
-            margin: 10px auto;
+            font-size: 16px;
             padding: 10px 20px;
             position: relative;
             text-decoration: none;
             width: 50px;
         }
 
-        .info__linkedin:hover {
-            border-bottom: 1px solid #333333;
-            margin-bottom: 11px;
-            top: 1px;
+        .btn:hover {
+            border-bottom-width: 1px;
+            transform: translateY(1px);
         }
 
-        .info__linkedin:active {
-            border-top: 2px solid #333333;
+        .btn:active {
+            border-top-width: 2px;
             padding: 11px 20px 8px;
         }
 
+        .field .btn {
+            animation-delay: var(--d, 0ms);
+        }
 
+        /* after a resize the wall is rebuilt, without re-running the show */
+        .field--instant .btn,
+        .field--instant .btn::after {
+            animation: none;
+        }
+
+        /*
+         * The extruded bottom side: a pseudo-element painted just
+         * below the button's real 2px bottom border. Growing it is
+         * pure paint, so the button's layout box never changes size
+         * and the gaps between buttons can never shift while the
+         * wave passes.
+         */
+
+        .btn::after {
+            background: var(--ink);
+            border-radius: 0 0 4px 4px;
+            content: '';
+            height: 0;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 2px);
+        }
+
+        .field .btn::after {
+            animation: popSide var(--pop-duration) backwards;
+            animation-delay: var(--d, 0ms);
+        }
+
+        /*
+         * The wall is decorative to assistive tech, so this is the one real
+         * keyboard/screen-reader link. It sits off-screen until focused,
+         * then slides in at the top left.
+         */
+
+        .escape {
+            animation: none; /* never part of the load show; the transform below keeps it off-screen */
+            left: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            position: fixed;
+            top: 1rem;
+            transform: translateX(-200%);
+            transition: opacity 150ms, transform 150ms;
+            z-index: 1;
+        }
+
+        .escape:focus,
+        .escape:focus-visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+
+        /*
+         * The load show. Each button fades in and leaps upward while
+         * its extruded side grows tall then short beneath it.
+         * Everything happens in transform and paint - the wall's
+         * geometry stays frozen, so nothing settles or shifts at the end.
+         */
+
+        @keyframes pop {
+            0%   { opacity: 0; transform: translateY(0); }
+            18%  { opacity: 1; }
+            55%  { transform: translateY(-5px); }
+            75%  { transform: translateY(1px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes popSide {
+            0%   { height: 0; }
+            55%  { height: 3px; }
+            100% { height: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn,
+            .field .btn::after {
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>
-<main>
-    <section class="info">
-        <!-- get outta here! -->
-        <h1 class="info__name">Marc Lewis</h1>
-        <a class="info__linkedin" href="https://www.linkedin.com/in/marc-lewis-58a2b37b/">linkedin</a>
-    </section>
-</main>
+<!-- get outta here! -->
+<a class="btn escape" href="https://www.linkedin.com/in/marc-lewis-58a2b37b/">linkedin</a>
+<div class="field" aria-hidden="true">
+    <div class="field__sheet"></div>
+</div>
 <script>
+(() => {
+    'use strict';
 
-  function getAudio(source) {
-    return new Promise((resolve, reject) => {
-      const clip = new Audio(source);
-      clip.addEventListener('canplaythrough', () => {
-        resolve(clip);
-      });
+    const LINK = 'https://www.linkedin.com/in/marc-lewis-58a2b37b/';
+    const root = document.documentElement;
+    const field = document.querySelector('.field');
+    const sheet = document.querySelector('.field__sheet');
+
+    const cssNumber = (name) =>
+        parseFloat(getComputedStyle(root).getPropertyValue(name));
+
+    const makeButton = () => {
+        const link = document.createElement('a');
+        link.className = 'btn';
+        link.href = LINK;
+        link.tabIndex = -1;
+        link.textContent = 'linkedin';
+        return link;
+    };
+
+    const buildWall = () => {
+        const probe = sheet.appendChild(makeButton());
+        const gap = cssNumber('--gap');
+        const across = probe.offsetWidth + gap;
+        const down = probe.offsetHeight + gap;
+        probe.remove();
+
+        const cols = Math.max(1, Math.floor(sheet.offsetWidth / across));
+        const rows = Math.max(1, Math.floor(sheet.offsetHeight / down));
+        const step = Math.min(cssNumber('--wipe-step'), 900 / cols);
+        const buttons = [];
+
+        for (let row = 0; row < rows; row += 1) {
+            for (let col = 0; col < cols; col += 1) {
+                const link = makeButton();
+                link.style.setProperty('--d', (col * step) + 'ms');
+                buttons.push(link);
+            }
+        }
+
+        sheet.replaceChildren(...buttons);
+    };
+
+    buildWall();
+
+    let rebuild;
+    addEventListener('resize', () => {
+        clearTimeout(rebuild);
+        rebuild = setTimeout(() => {
+            field.classList.add('field--instant');
+            buildWall();
+        }, 150);
     });
-  }
-
-  Promise.all([
-    getAudio('https://snd-effcts.s3-eu-west-1.amazonaws.com/zapsplat_multimedia_click_001_19367.mp3'),
-    getAudio('https://snd-effcts.s3-eu-west-1.amazonaws.com/zapsplat_multimedia_click_003_19369.mp3')
-  ])
-    .then(([click1, click2]) => {
-      document.querySelectorAll('a').forEach((button) => {
-        button.addEventListener('mouseover', () => {
-          click1.play().catch((err) => console.log(err));
-        });
-        button.addEventListener('click', () => {
-          click2.play().catch((err) => console.log(err));
-        })
-      });
-    });
-
+})();
 </script>
 </body>
 </html>
