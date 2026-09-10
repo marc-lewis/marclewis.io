@@ -178,10 +178,9 @@ const makeContext = (origin) => {
                 cells.forEach((cell) => cell.el.classList.remove('btn--still'));
             });
             return () => {
+                // stop any in-flight replay: freeze the cells where they
+                // are; the next stagger or rebuild releases them
                 cells.forEach((cell) => cell.el.classList.add('btn--still'));
-                requestAnimationFrame(() => {
-                    cells.forEach((cell) => cell.el.classList.remove('btn--still'));
-                });
             };
         },
         leave: () => {
