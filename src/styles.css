@@ -1,0 +1,214 @@
+:root {
+    --ink: #333333;
+    --gap: 10px;
+    --pop-duration: 650ms;
+    --wipe-sweep: 900ms; /* total duration of the load wipe, top left to bottom right */
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+/*
+ * The wall: a sheet of buttons, oversized (150%) and rotated -5deg,
+ * so its corners always sit past the edge of the viewport. The
+ * buttons are laid in running bond, like brickwork: alternate
+ * courses offset by half a button.
+ */
+
+.field {
+    inset: 0;
+    overflow: hidden;
+    position: fixed;
+    user-select: none;
+}
+
+.field__sheet {
+    height: 150vh;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(-5deg);
+    width: 150vw;
+}
+
+/*
+ * The button fakes depth with its border: resting state has a 2px
+ * bottom edge, hover presses it flat, active pushes it in.
+ * Buttons are scenery until an effect activates them.
+ */
+
+.btn {
+    animation: pop var(--pop-duration) backwards;
+    border: 1px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    border-radius: 5px;
+    box-sizing: content-box;
+    color: var(--ink);
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    position: absolute;
+    text-align: center;
+    text-decoration: none;
+    transition: opacity 600ms ease;
+    width: 50px;
+}
+
+.btn:hover {
+    border-bottom-width: 1px;
+    transform: translateY(1px);
+}
+
+.btn:active {
+    border-top-width: 2px;
+    padding: 11px 20px 8px;
+}
+
+.field .btn {
+    animation-delay: var(--d, 0ms);
+}
+
+/* after a resize the wall is rebuilt, without re-running the show */
+.field--instant .btn,
+.field--instant .btn::after {
+    animation: none;
+}
+
+/* used by ctx.stagger to replay the wave: freeze, retime, release */
+.btn--still,
+.btn--still::after {
+    animation: none;
+}
+
+/*
+ * The extruded bottom side: a pseudo-element painted just below
+ * the button's real 2px bottom border. Growing it is pure paint,
+ * so the button's layout box never changes size and the gaps
+ * between buttons can never shift while the wave passes.
+ */
+
+.btn::after {
+    background: var(--ink);
+    border-radius: 0 0 4px 4px;
+    content: '';
+    height: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 2px);
+}
+
+.field .btn::after {
+    animation: popSide var(--pop-duration) backwards;
+    animation-delay: var(--d, 0ms);
+}
+
+/*
+ * The game face. Revealed cells sit flush in the wall with the
+ * classic coloured count; flags and bombs invert the button -
+ * the minefield was linkedin all along.
+ */
+
+.cell--open,
+.cell--open:hover,
+.cell--open:active {
+    background: #f0f0f0;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+    font-weight: 700;
+    padding: 10px 20px;
+    transform: none;
+}
+
+.cell--n1 { color: #0000ff; }
+.cell--n2 { color: #008000; }
+.cell--n3 { color: #ff0000; }
+.cell--n4 { color: #000080; }
+.cell--n5 { color: #800000; }
+.cell--n6 { color: #008080; }
+.cell--n7 { color: #000000; }
+.cell--n8 { color: #999999; }
+
+.cell--flag,
+.cell--bomb {
+    background: var(--ink);
+    color: #ffffff;
+}
+
+.cell--boom {
+    background: #ff0000;
+    color: #ffffff;
+}
+
+/* scenery: buttons with no effect assigned, or outside the woken field */
+.cell--off,
+.cell--off:hover,
+.cell--off:active {
+    border-bottom-width: 2px;
+    border-top-width: 1px;
+    cursor: default;
+    opacity: 0.35;
+    padding: 10px 20px;
+    transform: none;
+}
+
+.field--won .btn {
+    background: var(--ink);
+    color: #ffffff;
+}
+
+/*
+ * The load show. Each button fades in and leaps upward while
+ * its extruded side grows tall then short beneath it.
+ * Everything happens in transform and paint - the wall's
+ * geometry stays frozen, so nothing settles or shifts at the end.
+ */
+
+@keyframes pop {
+    0%   { opacity: 0; transform: translateY(0); }
+    18%  { opacity: 1; }
+    55%  { transform: translateY(-5px); }
+    75%  { transform: translateY(1px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes popSide {
+    0%   { height: 0; }
+    55%  { height: 3px; }
+    100% { height: 0; }
+}
+
+/*
+ * The wall is decorative to assistive tech, so this is the one real
+ * keyboard/screen-reader link. It sits off-screen until focused,
+ * then slides in at the top left.
+ */
+
+.escape {
+    animation: none; /* never part of the load show; the transform below keeps it off-screen */
+    left: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 1rem;
+    transform: translateX(-200%);
+    transition: opacity 150ms, transform 150ms;
+    z-index: 1;
+}
+
+.escape:focus,
+.escape:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .field .btn::after {
+        animation: none;
+    }
+}
