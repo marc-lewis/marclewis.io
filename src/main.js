@@ -183,6 +183,22 @@ const makeContext = (origin) => {
                 cells.forEach((cell) => cell.el.classList.add('btn--still'));
             };
         },
+        // site-wide palettes: themes are state, not motion - they
+        // persist across effects until the next click or reload
+        theme: {
+            set: (palette) => {
+                if (palette.ink) root.style.setProperty('--ink', palette.ink);
+                if (palette.page) root.style.setProperty('--page', palette.page);
+                if (palette.dug) root.style.setProperty('--dug', palette.dug);
+                root.classList.toggle('theme--dark', !!palette.dark);
+            },
+            reset: () => {
+                root.style.removeProperty('--ink');
+                root.style.removeProperty('--page');
+                root.style.removeProperty('--dug');
+                root.classList.remove('theme--dark');
+            },
+        },
         leave: () => {
             setTimeout(() => { window.location.href = LINK; }, 1600);
         },

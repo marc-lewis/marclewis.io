@@ -1,11 +1,14 @@
 :root {
     --ink: #333333;
+    --page: #ffffff;
+    --dug: #f0f0f0;
     --gap: 10px;
     --pop-duration: 650ms;
     --wipe-sweep: 900ms; /* total duration of the load wipe, top left to bottom right */
 }
 
 body {
+    background: var(--page);
     margin: 0;
     overflow: hidden;
 }
@@ -115,7 +118,7 @@ body {
 .cell--open,
 .cell--open:hover,
 .cell--open:active {
-    background: #f0f0f0;
+    background: var(--dug);
     border-bottom-width: 1px;
     border-top-width: 1px;
     font-weight: 700;
@@ -132,16 +135,28 @@ body {
 .cell--n7 { color: #000000; }
 .cell--n8 { color: #999999; }
 
+/* inverted cells read with the page colour, so they work on any ink */
 .cell--flag,
 .cell--bomb {
     background: var(--ink);
-    color: #ffffff;
+    color: var(--page);
 }
 
 .cell--boom {
     background: #ff0000;
     color: #ffffff;
 }
+
+/* the classic number colours are tuned for light pages; brighter
+   counterparts when a dark theme is running */
+.theme--dark .cell--n1 { color: #7d9bff; }
+.theme--dark .cell--n2 { color: #6ecf7d; }
+.theme--dark .cell--n3 { color: #ff6b6b; }
+.theme--dark .cell--n4 { color: #9db4ff; }
+.theme--dark .cell--n5 { color: #ffa07a; }
+.theme--dark .cell--n6 { color: #7dd6d0; }
+.theme--dark .cell--n7 { color: #ffffff; }
+.theme--dark .cell--n8 { color: #aaaaaa; }
 
 /* scenery: buttons with no effect assigned, or outside the woken field */
 .cell--off,
@@ -157,7 +172,7 @@ body {
 
 .field--won .btn {
     background: var(--ink);
-    color: #ffffff;
+    color: var(--page);
 }
 
 /*

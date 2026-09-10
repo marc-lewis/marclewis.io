@@ -17,7 +17,7 @@ self-contained `dist/index.html`, so the site stays one file.
 
 Effects export `meta` (id, name, label, placement) and `run(ctx)`, and
 `run` returns a cleanup function. The context hands effects the button
-grid, cell activation, click/flag routing, the stagger helper, `leave()`,
-and `done()` for transient effects that finish on their own. One effect
-runs at a time; starting a new one cleans up the old. Full plan: `plans/2026-09-09-button-plugin-system.md`. Idea
+grid, cell activation, click/flag routing, the stagger helper, the theme
+setter, `leave()`, and `done()` for transient effects that finish on their
+own. One effect runs at a time; starting a new one cleans up the old. Full plan: `plans/2026-09-09-button-plugin-system.md`. Idea
 backlog: `button_ideas.md` and `button_ideas_big_list.md`.
