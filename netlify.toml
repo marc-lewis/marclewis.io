@@ -1,0 +1,9 @@
+# the site is built, not served: netlify publishes dist/index.html,
+# never the raw source (import.meta.glob only exists inside vite)
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # match local dev (vite 8 needs node 20.19+)
+  NODE_VERSION = "24"
